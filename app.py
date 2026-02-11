@@ -21,14 +21,6 @@ st.markdown(
         padding-top: 0rem;
     }
 
-    h1 {
-        text-align: center;
-        color: black;
-        margin-top: 1rem;
-        margin-bottom: 1.5rem;
-        font-weight: 700;
-    }
-
     label {
         color: black !important;
         font-weight: 600;
@@ -68,11 +60,25 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# ---------------- TITLE (BLACK TEXT - FIXED) ----------------
+st.markdown(
+    """
+    <div style="
+        text-align:center;
+        font-size:48px;
+        font-weight:900;
+        color:black;
+        margin-top:20px;
+        margin-bottom:20px;
+    ">
+        LapWorth
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # ---------------- Load Model ----------------
 model = pickle.load(open("model.pkl", "rb"))
-
-# ---------------- Title ----------------
-st.markdown("<h1>LapWorth</h1>", unsafe_allow_html=True)
 
 # ---------------- Layout ----------------
 col1, col2, col3, col4 = st.columns(4)
@@ -100,23 +106,30 @@ with col4:
 
 # ---------------- Prediction ----------------
 if st.button("Predict Price"):
-    X_res,Y_res = map(int,resolution.split("x"))
-    ppi = ((X_res**2 + Y_res**2)**0.5)/screen_size
+    X_res, Y_res = map(int, resolution.split("x"))
+    ppi = ((X_res**2 + Y_res**2) ** 0.5) / screen_size
 
     input_df = pd.DataFrame([{
-        "Company":company,
-        "TypeName":type_name,
-        "Ram":ram,
-        "Weight":weight,
-        "TouchScreen":1 if touchscreen=="Yes" else 0,
-        "IPS Panel":1 if ips=="Yes" else 0,
-        "ppi":ppi,
-        "Cpu_brand":cpu,
-        "HDD":hdd,
-        "SSD":ssd,
-        "Gpu_Brand":gpu,
-        "OS":os
+        "Company": company,
+        "TypeName": type_name,
+        "Ram": ram,
+        "Weight": weight,
+        "TouchScreen": 1 if touchscreen == "Yes" else 0,
+        "IPS Panel": 1 if ips == "Yes" else 0,
+        "ppi": ppi,
+        "Cpu_brand": cpu,
+        "HDD": hdd,
+        "SSD": ssd,
+        "Gpu_Brand": gpu,
+        "OS": os
     }])
 
     price = np.exp(model.predict(input_df)[0])
-    st.success(f"💰 Predicted Price: ₹ {int(price)}")
+
+    laptop_name = f"{company} {type_name} | {cpu} | {ram}GB RAM | {ssd}GB SSD"
+
+    st.success(f"""
+Laptop: {laptop_name}
+
+Predicted Price: ₹ {int(price)}
+""")
